@@ -20,16 +20,15 @@
 
 #include "LoopClosing.h"
 
+#include <unistd.h>
+
+#include <mutex>
+#include <thread>
+
 #include "Sim3Solver.h"
-
 #include "Converter.h"
-
 #include "Optimizer.h"
-
 #include "ORBmatcher.h"
-
-#include<mutex>
-#include<thread>
 
 
 namespace ORB_SLAM2

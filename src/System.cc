@@ -22,6 +22,9 @@
 
 #include "System.h"
 #include "Converter.h"
+
+#include <unistd.h>
+
 #include <thread>
 #include <iomanip>
 

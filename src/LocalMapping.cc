@@ -19,11 +19,14 @@
 */
 
 #include "LocalMapping.h"
+
+#include <unistd.h>
+
+#include <mutex>
+
 #include "LoopClosing.h"
 #include "ORBmatcher.h"
 #include "Optimizer.h"
-
-#include<mutex>
 
 namespace ORB_SLAM2
 {
