@@ -24,7 +24,10 @@
 #include"Map.h"
 #include"MapPoint.h"
 #include"KeyFrame.h"
+
+#ifdef ORB_SLAM2_HAS_PANGOLIN
 #include<pangolin/pangolin.h>
+#endif
 
 #include<mutex>
 
@@ -40,10 +43,14 @@ public:
 
     void DrawMapPoints();
     void DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph);
+
+#ifdef ORB_SLAM2_HAS_PANGOLIN
     void DrawCurrentCamera(pangolin::OpenGlMatrix &Twc);
+    void GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M);
+#endif
+
     void SetCurrentCameraPose(const cv::Mat &Tcw);
     void SetReferenceKeyFrame(KeyFrame *pKF);
-    void GetCurrentOpenGLCameraMatrix(pangolin::OpenGlMatrix &M);
 
 private:
 
