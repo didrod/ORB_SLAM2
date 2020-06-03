@@ -23,14 +23,6 @@ if(MSVC90)
 endif(MSVC90)
 
 # Set the output directory for the build executables and libraries
-IF(WIN32)
-  SET(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/bin CACHE PATH "Target for the libraries")
-ELSE(WIN32)
-  SET(g2o_LIBRARY_OUTPUT_DIRECTORY ${g2o_SOURCE_DIR}/lib CACHE PATH "Target for the libraries")
-ENDIF(WIN32)
-SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
-SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${g2o_LIBRARY_OUTPUT_DIRECTORY})
-SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${g2o_RUNTIME_OUTPUT_DIRECTORY})
 
 # Set search directory for looking for our custom CMake scripts to
 # look for SuiteSparse, QGLViewer, and Eigen3.
@@ -76,7 +68,6 @@ ENDIF(EIGEN3_FOUND)
 
 # Generate config.h
 SET(G2O_CXX_COMPILER "${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER}")
-configure_file(config.h.in ${g2o_SOURCE_DIR}/config.h)
 
 # Set up the top-level include directories
 INCLUDE_DIRECTORIES(
@@ -86,7 +77,7 @@ ${g2o_SOURCE_DIR}/stuff
 ${G2O_EIGEN3_INCLUDE})
 
 # Include the subdirectories
-ADD_LIBRARY(g2o ${G2O_LIB_TYPE}
+ADD_LIBRARY(ORB_SLAM2_FORKED_g2o ${G2O_LIB_TYPE}
 #types
 g2o/types/types_sba.h
 g2o/types/types_six_dof_expmap.h

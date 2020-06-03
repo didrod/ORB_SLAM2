@@ -38,19 +38,13 @@ endif()
 
 find_package(Eigen3 3.1.0 REQUIRED)
 
-include_directories(
-${PROJECT_SOURCE_DIR}
-${PROJECT_SOURCE_DIR}/include
-${EIGEN3_INCLUDE_DIR}
-${Pangolin_INCLUDE_DIRS}
-)
-
 if (ORB_SLAM2_BUILD_WITH_PANGOLIN)
   find_package(Pangolin REQUIRED)
   add_definitions(-DORB_SLAM2_HAS_PANGOLIN)
 endif()
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+add_subdirectory(Thirdparty/DBoW2)
+add_subdirectory(Thirdparty/g2o)
 
 add_library(${PROJECT_NAME} SHARED
 src/System.cc
@@ -75,11 +69,19 @@ src/Viewer.cc
 )
 
 target_link_libraries(${PROJECT_NAME}
-${OpenCV_LIBS}
-${EIGEN3_LIBS}
-${Pangolin_LIBRARIES}
-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+  PUBLIC
+  ORB_SLAM2_FORKED_g2o
+  ORB_SLAM2_FORKED_DBoW2
+  ${OpenCV_LIBS}
+  ${EIGEN3_LIBS}
+  ${Pangolin_LIBRARIES}
+)
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+  ${PROJECT_SOURCE_DIR}/include
+  ${PROJECT_SOURCE_DIR}/Thirdparty
+  ${EIGEN3_INCLUDE_DIR}
+  ${Pangolin_INCLUDE_DIRS}
 )
 
 # Build examples

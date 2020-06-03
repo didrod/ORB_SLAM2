@@ -32,9 +32,6 @@ if(NOT OpenCV_FOUND)
    endif()
 endif()
 
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-
-include_directories(${OpenCV_INCLUDE_DIRS})
-add_library(DBoW2 SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
-target_link_libraries(DBoW2 ${OpenCV_LIBS})
-
+add_library(ORB_SLAM2_FORKED_DBoW2 SHARED ${SRCS_DBOW2} ${SRCS_DUTILS})
+target_include_directories(ORB_SLAM2_FORKED_DBoW2 PUBLIC ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(ORB_SLAM2_FORKED_DBoW2 PUBLIC ${OpenCV_LIBS})
