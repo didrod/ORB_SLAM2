@@ -57,9 +57,10 @@ public:
     };
 
 public:
-
-    // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor, const bool bUseViewer = true);
+    System(
+        const string &strVocFile, const string &strSettingsFile,
+        const eSensor sensor, const bool bUseViewer = true,
+        const bool bEnableLoopClosing = true);
 
     // Proccess the given stereo frame. Images must be synchronized and rectified.
     // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
@@ -122,13 +123,18 @@ public:
     std::vector<MapPoint*> GetTrackedMapPoints();
     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
 
-    std::unique_lock<mutex> LockMapUpdate() {
-      return unique_lock<mutex>(mpMap->mMutexMapUpdate);
-    }
-
     cv::Mat DrawFrame() const;
     Frame const& GetCurrentFrame() const;
     std::vector<MapPoint*> GetAllMapPoints() const;
+
+    std::unique_lock<mutex> LockMapUpdate()
+    {
+        return unique_lock<mutex>(mpMap->mMutexMapUpdate);
+    }
+    bool LoopClosingEnabled() const
+    {
+        return mbEnableLoopClosing;
+    }
 
 private:
 
@@ -182,6 +188,8 @@ private:
     std::vector<MapPoint*> mTrackedMapPoints;
     std::vector<cv::KeyPoint> mTrackedKeyPointsUn;
     std::mutex mMutexState;
+
+    const bool mbEnableLoopClosing;
 };
 
 }// namespace ORB_SLAM

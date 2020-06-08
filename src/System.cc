@@ -35,9 +35,17 @@
 namespace ORB_SLAM2
 {
 
-System::System(const string &strVocFile, const string &strSettingsFile, const eSensor sensor,
-               const bool bUseViewer):mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), mbReset(false),mbActivateLocalizationMode(false),
-        mbDeactivateLocalizationMode(false)
+System::System(
+    const string &strVocFile, const string &strSettingsFile,
+    const eSensor sensor, const bool bUseViewer, const bool bEnableLoopClosing):
+        mSensor(sensor),
+        mpLoopCloser(nullptr),
+        mpViewer(static_cast<Viewer*>(NULL)),
+        mptLoopClosing(nullptr),
+        mbReset(false),
+        mbActivateLocalizationMode(false),
+        mbDeactivateLocalizationMode(false),
+        mbEnableLoopClosing(bEnableLoopClosing)
 {
     // Output welcome message
     cout << endl <<
@@ -97,8 +105,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mptLocalMapping = new thread(&ORB_SLAM2::LocalMapping::Run,mpLocalMapper);
 
     //Initialize the Loop Closing thread and launch
-    mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR);
-    mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
+    if (mbEnableLoopClosing)
+    {
+        mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR);
+        mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
+    }
 
     //Initialize the Viewer thread and launch
     if(bUseViewer)
@@ -115,8 +126,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpLocalMapper->SetTracker(mpTracker);
     mpLocalMapper->SetLoopCloser(mpLoopCloser);
 
-    mpLoopCloser->SetTracker(mpTracker);
-    mpLoopCloser->SetLocalMapper(mpLocalMapper);
+    if (mbEnableLoopClosing)
+    {
+        mpLoopCloser->SetTracker(mpTracker);
+        mpLoopCloser->SetLocalMapper(mpLocalMapper);
+    }
 }
 
 cv::Mat System::TrackStereo(const cv::Mat &imLeft, const cv::Mat &imRight, const double &timestamp)
@@ -307,7 +321,11 @@ void System::Reset()
 void System::Shutdown()
 {
     mpLocalMapper->RequestFinish();
-    mpLoopCloser->RequestFinish();
+    if (mbEnableLoopClosing)
+    {
+        mpLoopCloser->RequestFinish();
+    }
+
     if(mpViewer)
     {
         mpViewer->RequestFinish();
@@ -316,7 +334,16 @@ void System::Shutdown()
     }
 
     // Wait until all thread have effectively stopped
-    while(!mpLocalMapper->isFinished() || !mpLoopCloser->isFinished() || mpLoopCloser->isRunningGBA())
+    auto&& local_mapper_is_terminated = [&]() -> bool
+    {
+        return mpLocalMapper->isFinished();
+    };
+    auto&& loop_closure_is_terminated = [&]() -> bool
+    {
+        return !mbEnableLoopClosing ||
+            (mpLoopCloser->isFinished() && !mpLoopCloser->isRunningGBA());
+    };
+    while (!local_mapper_is_terminated() || !loop_closure_is_terminated())
     {
         usleep(5000);
     }
