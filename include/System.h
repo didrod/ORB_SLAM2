@@ -122,6 +122,14 @@ public:
     std::vector<MapPoint*> GetTrackedMapPoints();
     std::vector<cv::KeyPoint> GetTrackedKeyPointsUn();
 
+    std::unique_lock<mutex> LockMapUpdate() {
+      return unique_lock<mutex>(mpMap->mMutexMapUpdate);
+    }
+
+    cv::Mat DrawFrame() const;
+    Frame const& GetCurrentFrame() const;
+    std::vector<MapPoint*> GetAllMapPoints() const;
+
 private:
 
     // Input sensor

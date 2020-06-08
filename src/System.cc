@@ -497,4 +497,18 @@ vector<cv::KeyPoint> System::GetTrackedKeyPointsUn()
     return mTrackedKeyPointsUn;
 }
 
+cv::Mat System::DrawFrame() const
+{
+    return mpFrameDrawer ? mpFrameDrawer->DrawFrame() : cv::Mat();
+}
+
+Frame const& System::GetCurrentFrame() const
+{
+    return mpTracker->mCurrentFrame;
+}
+
+std::vector<MapPoint*> System::GetAllMapPoints() const
+{
+    return mpMap->GetAllMapPoints();
+}
 } //namespace ORB_SLAM
